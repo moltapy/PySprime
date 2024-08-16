@@ -26,8 +26,8 @@ class SampleList:
             # TODO:兼容性，具体使用的时候要改成\t
             line = line.strip().split()
             groups[line[i_pop]].append(line[i_sample])
-            self.group_content = groups[self.outgroup]
-            groups.pop(self.outgroup)
+        self.group_content = groups[self.outgroup]
+        groups.pop(self.outgroup)
         return groups
 
     @staticmethod

@@ -1,8 +1,6 @@
-from Functions import *
 
 
-genotype_file = "123/456/78{chrom}.vcf"
+chrom = 1
+a = [(f'{chrom}/{name}',name) for name in range(1,3)] 
 
-genotype_file= genotype_file.format(chrom="chr12")
-
-print(genotype_file)
+print(a)
