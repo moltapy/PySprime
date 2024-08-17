@@ -1,7 +1,6 @@
 import Decorator
 import os
 import time
-# 下面这个起个别名叫进程池管理器
 from concurrent.futures import ProcessPoolExecutor, as_completed
 
 
@@ -86,7 +85,7 @@ def sprimemain(path: str, name: str, sprime_path: str, genotype_file: str, outgr
             future.result()
 
 
-def mapexecutor(expression:tuple):
+def mapexecutor(expression: tuple):
     os.system(expression[0])
     os.system(expression[1])
     print("mapping over")
@@ -95,13 +94,33 @@ def mapexecutor(expression:tuple):
 def maparch(path: str, pop: str, executable: str, tag_x: str, maskfile_x, variant_x,
             tag_y: str, maskfile_y, variant_y, scorefile, outfile_phase1, outfile_phase2):
     scorefile = f"{path}/{pop}/Result/Phase1/{scorefile}"
+    dirout_phase1 = f"{path}/{pop}/Result/Phase2/"
+    dirout_phase2 = f"{path}/{pop}/Result/Final/"
+    os.makedirs(dirout_phase1, exist_ok=True)
+    os.makedirs(dirout_phase2, exist_ok=True)
     outfile_phase1 = f"{path}/{pop}/Result/Phase2/{outfile_phase1}"
     outfile_phase2 = f"{path}/{pop}/Result/Final/{outfile_phase2}"
     expression = (f"{executable} --kp --sep '\t' --tag {tag_x} --mskbed {maskfile_x} --vcf {variant_x}"
-                  f"--score {scorefile} > {outfile_phase1}", f"{executable} --kp --sep '\t' --tag {tag_y} "
+                  f" --score {scorefile}.score > {outfile_phase1}", f"{executable} --kp --sep '\t' --tag {tag_y} "
                   f"--mskbed {maskfile_y} --vcf {variant_y} --score {outfile_phase1} > {outfile_phase2}")
     expressions = [(expression[0].format(chrom=chr), expression[1].format(chrom=chr)) for chr in range(1, 23)]
-    with ProcessPoolExecutor(max_workers=2) as executor:
+    with ProcessPoolExecutor(max_workers=22) as executor:
         futures = [executor.submit(mapexecutor, expression) for expression in expressions]
         for future in as_completed(futures):
             future.result()
+
+
+def summary(script_path: str, summary_file: str, output: str):
+    expression = f"Rscript {script_path} {summary_file} {output}"
+    os.system(expression)
+
+
+def draw_contour(summary_path: str, contour_path: str, dirname: str, pop: str):
+    target_path = f"{dirname}/{pop}/Result/Final"
+    result_path = f"{target_path}/Summary/"
+    os.makedirs(result_path, exist_ok=True)
+    summary_file = f"{result_path}/summary.txt"
+    expression = f"Rscript {summary_path} {target_path} {summary_file}"
+    os.system(expression)
+    result_path = f"{result_path}/{pop}"
+    summary(contour_path, summary_file, result_path)

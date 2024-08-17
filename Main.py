@@ -1,6 +1,5 @@
 import configparser
-import Functions
-import threading
+from concurrent.futures import as_completed, ProcessPoolExecutor
 from ClassLoader import *
 
 config = configparser.ConfigParser()
@@ -35,7 +34,7 @@ maparch = config['Map_Archaic_Path']['path']
 ## Neanderthal VCF files
 neanderthal = config['Neand_Variants_File']['path']
 ## Denisovan VCF files
-denisovan = config['Denisovan_Variants_File']['path']
+denisovan = config['Deni_Variants_File']['path']
 ## Neanderthal exclude mask
 neandmask = config['Neand_Mask_File']['path']
 ## Denisovan exclude mask
@@ -48,43 +47,44 @@ denitag = config['Denisovan_Tag']['tag']
 neandoutfile = config['Neand_Output_File']['path']
 ## Denisovan match result file, default final
 denioutfile = config['Denisovan_Output_File']['path']
+## Script for summary
+summary_script = config['Rscript_Phasing_Plot']['path']
+## Script for draw contours
+draw_script = config['Rscript_Phasing_Contour']['path']
 
 if __name__ == "__main__":
     sample = SampleList(samplelist, outgroup=outgroup, header=sampleheader)
-    #with open(outgroup_path,"wt") as out:
-    #    for item in sample.group_content:
-    #        out.write(f"{item}\n")
-    ## 分离群体中的样本，与outgroup合并
-    #with ThreadPoolExecutor(max_workers=10) as pool:
-    #    futures = [pool.submit(Functions.samplecluster, name, item+sample.group_content)
-    #               for name, item in sample.groups.items()]
-    #    for future in futures:
-    #        future.result()
-#
-    ## 10个线程，20个进程提交给bcftools进行处理，得到vcf文件
-    #with ThreadPoolExecutor(max_workers=5) as pool:
-    #    # 注意开始在这里错误传递了list导致不能正确序列化
-    #    # for test [:3]
-    #    dirname = os.getcwd()
-    #    futures = [pool.submit(Functions.subextract, f"{dirname}/{name}",name, modern_list, [f"{dirname}/{name}/{item}" for item in submodern_list]) 
-    #    for name in list(sample.groups.keys())[:2]]
-    #    for future in futures:
-    #        future.result()
+    with open(outgroup_path, "wt") as out:
+        for item in sample.group_content:
+            out.write(f"{item}\n")
+    # 分离群体中的样本，与outgroup合并
+    with ThreadPoolExecutor(max_workers=10) as pool:
+        futures = [pool.submit(Functions.samplecluster, name, item+sample.group_content)
+                   for name, item in sample.groups.items()]
+        for future in futures:
+            future.result()
+
+    # 10个线程，20个进程提交给bcftools进行处理，得到vcf文件
+    with ThreadPoolExecutor(max_workers=5) as pool:
+        dirname = os.getcwd()
+        futures = [pool.submit(Functions.subextract, f"{dirname}/{name}", name, modern_list,
+                               [f"{dirname}/{name}/{item}" for item in submodern_list]) for name in sample.groups]
+        for future in futures:
+            future.result()
 
     # 将群体中的vcf合并称为一个vcf文件
-    #with Functions.ProcessPoolExecutor(max_workers=10) as pool:
-    #    # for test [:2]
-    #    dirname = os.getcwd()
-    #    futures = [pool.submit(Functions.bcfconcat, dirname, name, submodern_list, concated_file) for name in list(sample.groups.keys())[:2]]
-    #    for future in futures:
-    #        future.result()
+    with Functions.ProcessPoolExecutor(max_workers=10) as pool:
+        dirname = os.getcwd()
+        futures = [pool.submit(Functions.bcfconcat, dirname, name, submodern_list, concated_file)
+                   for name in sample.groups]
+        for future in futures:
+            future.result()
 
     # 运行sprime.jar
     with ThreadPoolExecutor(max_workers=2) as pool:
-        # for test [:3]
-        dirname = os.getcwd() 
+        dirname = os.getcwd()
         futures = [pool.submit(Functions.sprimemain, dirname, name, sprime_path,
-                               concated_file, outgroup_path, genetic_map, sprime_out) for name in list(sample.groups.keys())[:2]]
+                               concated_file, outgroup_path, genetic_map, sprime_out) for name in sample.groups]
         for future in futures:
             future.result()
 
@@ -97,9 +97,17 @@ if __name__ == "__main__":
         for future in futures:
             future.result()
 
-
+    # Summary Matched Score Files and Draw Contour plots
+    with ProcessPoolExecutor(max_workers=10) as pool:
+        dirname = os.getcwd()
+        futures = [pool.submit(Functions.draw_contour, summary_script, draw_script, dirname, name)
+                   for name in list(sample.groups.keys())[:2]]
+        for future in as_completed(futures):
+            future.result()
 
 ## 设计思想：html显示最终是一种延迟，也就是最后的图像展示，是请求式生成，先生成一个列表，然后按照需求发送get请求生成
 ## log和tqdm后续完善
-
-
+## 到作图之前的基本逻辑完成了，优化：两个方向：
+# 1. log日志
+# 2. 作图写选择式
+# 3. 配置提醒

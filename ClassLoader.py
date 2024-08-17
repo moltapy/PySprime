@@ -1,7 +1,6 @@
 import os
 import Interfaces
 import Functions
-from concurrent.futures import ThreadPoolExecutor
 from collections import defaultdict
 
 
@@ -37,12 +36,3 @@ class SampleList:
         else:
             print("{path} not exists, Please check the path")
             exit(1)
-
-
-#if __name__ == '__main__':
-#    sample = SampleList("test/test_example1.txt", outgroup="YRI", header=True)
-#    with ThreadPoolExecutor(max_workers=10) as pool:
-#        futures = [pool.submit(Functions.samplecluster, name, item+sample.group_content) for name, item in sample.groups.items()]
-#        for future in futures:
-#            future.result()
-#
