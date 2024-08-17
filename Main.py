@@ -15,7 +15,7 @@ if __name__ == "__main__":
             out.write(f"{item}\n")
     # Extract sample id from samplelist and cluster with outgroup samples
     with ThreadPoolExecutor(max_workers=args.threads) as pool:
-        futures = [pool.submit(Functions.samplecluster, name, item+sample.group_content)
+        futures = [pool.submit(Functions.samplecluster, dirname, name, item+sample.group_content)
                    for name, item in sample.groups.items()]
         for future in futures:
             future.result()
