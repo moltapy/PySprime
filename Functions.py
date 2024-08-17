@@ -101,7 +101,7 @@ def maparch(path: str, pop: str, executable: str, tag_x: str, maskfile_x, varian
                   f"--score {scorefile} > {outfile_phase1}", f"{executable} --kp --sep '\t' --tag {tag_y} "
                   f"--mskbed {maskfile_y} --vcf {variant_y} --score {outfile_phase1} > {outfile_phase2}")
     expressions = [(expression[0].format(chrom=chr), expression[1].format(chrom=chr)) for chr in range(1, 23)]
-    with ProcessPoolExecutor(max_workers=22) as executor:
+    with ProcessPoolExecutor(max_workers=2) as executor:
         futures = [executor.submit(mapexecutor, expression) for expression in expressions]
         for future in as_completed(futures):
             future.result()
