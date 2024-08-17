@@ -17,28 +17,28 @@ if __name__ == "__main__":
     with ThreadPoolExecutor(max_workers=args.threads) as pool:
         futures = [pool.submit(Functions.samplecluster, dirname, name, item+sample.group_content)
                    for name, item in sample.groups.items()]
-        for future in futures:
+        for future in as_completed(futures):
             future.result()
 
     # Bcftools split VCF files, get VCF files with a certain modern population and outgroup population
     with ThreadPoolExecutor(max_workers=args.threads) as pool:
         futures = [pool.submit(Functions.subextract, f"{dirname}/{name}", name, modern_list,
                                [f"{dirname}/{name}/{item}" for item in submodern_list]) for name in sample.groups]
-        for future in futures:
+        for future in as_completed(futures):
             future.result()
 
     # Bcftools concat VCF files
     with Functions.ProcessPoolExecutor(max_workers=args.threads) as pool:
         futures = [pool.submit(Functions.bcfconcat, dirname, name, submodern_list, concated_file)
                    for name in sample.groups]
-        for future in futures:
+        for future in as_completed(futures):
             future.result()
 
     # Run sprime.jar to get score files
     with ThreadPoolExecutor(max_workers=args.sprimethreads) as pool:
         futures = [pool.submit(Functions.sprimemain, dirname, name, sprime_path,
                                concated_file, outgroup_name, genetic_map, sprime_out) for name in sample.groups]
-        for future in futures:
+        for future in as_completed(futures):
             future.result()
 
     # Mapping Archaic 
@@ -46,7 +46,7 @@ if __name__ == "__main__":
         futures = [pool.submit(Functions.maparch, dirname, name, maparch, neandtag, neandmask, neanderthal,
                                denitag, denimask, denisovan, sprime_out, neandoutfile, denioutfile)
                    for name in sample.groups]
-        for future in futures:
+        for future in as_completed(futures):
             future.result()
 
     # Summary Matched Score Files and Draw Contour plots
