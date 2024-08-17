@@ -2,9 +2,13 @@ import Decorator
 import os
 import time
 from concurrent.futures import ProcessPoolExecutor, as_completed
+from Main import args
 
 
 # Functions
+def selector(func1, func2, condition) -> tuple:
+    return func1(condition) if condition \
+        else func2()
 
 
 @Decorator.matching
@@ -49,7 +53,7 @@ def bcfexecutor(sample: str, vcffile: str, output: str):
 def subextract(path: str, name: str, infile: list, outfile: list):
     samplefile = f"{path}/{name}.txt"
     print(f"finding {samplefile} in {os.getcwd()}")
-    with ProcessPoolExecutor(max_workers=22) as executor:
+    with ProcessPoolExecutor(max_workers=args.process) as executor:
         futures = [executor.submit(bcfexecutor, samplefile, filein, fileout)
                    for filein, fileout in zip(infile, outfile)]
         for future in as_completed(futures):
@@ -79,7 +83,7 @@ def sprimemain(path: str, name: str, sprime_path: str, genotype_file: str, outgr
     expressions = [(f"time java -jar {sprime_path} gt={genotype_file} "
                     f"outgroup={outgroup} map={map_file} out={out} chrom={chrom} minscore=150000")
                    for out, chrom in zip(output, range(1, 23))]
-    with ProcessPoolExecutor(max_workers=2) as executor:
+    with ProcessPoolExecutor(max_workers=args.sprimeprocess) as executor:
         futures = [executor.submit(sprimexecutor, expression) for expression in expressions]
         for future in as_completed(futures):
             future.result()
@@ -104,7 +108,7 @@ def maparch(path: str, pop: str, executable: str, tag_x: str, maskfile_x, varian
                   f" --score {scorefile}.score > {outfile_phase1}", f"{executable} --kp --sep '\t' --tag {tag_y} "
                   f"--mskbed {maskfile_y} --vcf {variant_y} --score {outfile_phase1} > {outfile_phase2}")
     expressions = [(expression[0].format(chrom=chr), expression[1].format(chrom=chr)) for chr in range(1, 23)]
-    with ProcessPoolExecutor(max_workers=22) as executor:
+    with ProcessPoolExecutor(max_workers=args.process) as executor:
         futures = [executor.submit(mapexecutor, expression) for expression in expressions]
         for future in as_completed(futures):
             future.result()

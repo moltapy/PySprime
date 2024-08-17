@@ -1,5 +1,4 @@
 import os
-import Interfaces
 import Functions
 from collections import defaultdict
 
@@ -18,8 +17,8 @@ class SampleList:
         groups = defaultdict(list)
         infile = open(self.path, 'rt')
         header = infile.readline() if self.header else None
-        i_sample, i_pop = Interfaces.selector(Functions.headerindex,
-                                              Functions.nullindex, header)
+        i_sample, i_pop = Functions.selector(Functions.headerindex,
+                                             Functions.nullindex, header)
         # O(n),能不能降
         for line in infile:
             # TODO:兼容性，具体使用的时候要改成\t
