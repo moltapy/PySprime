@@ -9,6 +9,7 @@ dirname = f"{os.getcwd()}/Sprime_Out"
 if __name__ == "__main__":
     os.makedirs(dirname, exist_ok=True)
     sample = SampleList(samplelist, outgroup=outgroup, header=sampleheader)
+    outgroup_path = f"{dirname}/{outgroup_name}"
     with open(outgroup_path, "wt") as out:
         for item in sample.group_content:
             out.write(f"{item}\n")
@@ -36,7 +37,7 @@ if __name__ == "__main__":
     # Run sprime.jar to get score files
     with ThreadPoolExecutor(max_workers=args.sprimethreads) as pool:
         futures = [pool.submit(Functions.sprimemain, dirname, name, sprime_path,
-                               concated_file, outgroup_path, genetic_map, sprime_out) for name in sample.groups]
+                               concated_file, outgroup_name, genetic_map, sprime_out) for name in sample.groups]
         for future in futures:
             future.result()
 

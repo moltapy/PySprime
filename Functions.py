@@ -30,9 +30,10 @@ def nullindex() -> tuple:
 
 
 @Decorator.matching
-def samplecluster(name: str, sample: list):
-    os.makedirs(name, exist_ok=True)
-    with open(name + "/" + name + ".txt", "wt") as outfile:
+def samplecluster(path: str, name: str, sample: list):
+    dirpath = f"{path}/{name}"
+    os.makedirs(dirpath, exist_ok=True)
+    with open(dirpath + "/" + name + ".txt", "wt") as outfile:
         for item in sample:
             outfile.write(item + "\n")
 

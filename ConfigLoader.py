@@ -19,8 +19,8 @@ submodern_list = [config['Submodern_Variants_File']['path'].format(chrom=chr) fo
 sprime_path = config['Sprime_Jar_Path']['path']
 ## genetic map file
 genetic_map = config['Genetic_Map_File']['path']
-## generated outgroup.txt path
-outgroup_path = config['Outgroup_Sample_List']['path']
+## generated outgroup.txt name
+outgroup_name = config['Outgroup_Sample_List']['name']
 ## VCF file name after concat
 concated_file = config['Concated_Submodern_Variants_File']['name']
 ## Sprime output score files
