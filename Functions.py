@@ -78,6 +78,7 @@ def sprimexecutor(expression: str):
 @Decorator.matching
 def sprimemain(path: str, name: str, sprime_path: str, genotype_file: str, outgroup: str, map_file: str, output: str):
     dirpath = f"{path}/{name}/Result/Phase1"
+    outgroup = f"{path}/{outgroup}"
     genotype_file = f"{path}/{name}/Concat/{genotype_file}"
     os.makedirs(dirpath, exist_ok=True)
     output = [f"{dirpath}/{output.format(chrom=chr)}" for chr in range(1, 23)]
