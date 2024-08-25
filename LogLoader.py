@@ -13,5 +13,3 @@ class Logger:
         self.handler.setLevel(logging.INFO)
         self.handler.Formatter = logging.Formatter(self.format)
 
-
-    def
