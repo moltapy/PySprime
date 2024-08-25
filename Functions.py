@@ -1,5 +1,4 @@
 import os
-import subprocess
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from Main import args
 
@@ -95,8 +94,8 @@ def sprimeMain(workPath: str, popName: str, sprimePath: str, concatedVcfFile: st
 
 
 def mappingExecutor(expression: tuple):
-    subprocess.run(expression[0], stderr=subprocess.DEVNULL)
-    subprocess.run(expression[1], stderr=subprocess.DEVNULL)
+    os.system(expression[0])
+    os.system(expression[1])
     print("mapping over")
 
 
@@ -110,8 +109,9 @@ def mappingArchaic(workPath: str, popName: str, maparchExecutor: str, tag_x: str
     outfile_phase1 = f"{workPath}/{popName}/Result/Phase2/{outfile_phase1}"
     outfile_phase2 = f"{workPath}/{popName}/Result/Final/{outfile_phase2}"
     expression = (f"{maparchExecutor} --kp --sep '\t' --tag {tag_x} --mskbed {maskfile_x} --vcf {variant_x}"
-                  f" --score {scorefile}.score > {outfile_phase1}", f"{maparchExecutor} --kp --sep '\t' --tag {tag_y} "
-                  f"--mskbed {maskfile_y} --vcf {variant_y} --score {outfile_phase1} > {outfile_phase2}")
+                  f" --score {scorefile}.score > {outfile_phase1} 2>/dev/null",
+                  f"{maparchExecutor} --kp --sep '\t' --tag {tag_y} "
+                  f"--mskbed {maskfile_y} --vcf {variant_y} --score {outfile_phase1} > {outfile_phase2} 2>/dev/null")
     expressions = [(expression[0].format(chrom=chr), expression[1].format(chrom=chr)) for chr in range(1, 23)]
     with ProcessPoolExecutor(max_workers=args.process) as executor:
         futures = [executor.submit(mappingExecutor, expression) for expression in expressions]
