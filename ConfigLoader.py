@@ -2,7 +2,7 @@ import configparser
 
 
 config = configparser.ConfigParser()
-config.read('Config.ini')
+config.read('Config_Test.ini')
 
 # Paths:
 ## samplelist.txt

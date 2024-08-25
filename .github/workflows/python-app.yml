@@ -28,6 +28,17 @@ jobs:
         python -m pip install --upgrade pip
         pip install flake8 pytest
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+    - name: Install bcftools
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y bcftools
+    - name: Make maparch
+      run: |
+        cd test/Tools/map_arch_genome
+        mkdir build
+        cd build
+        cmake ..
+        make
     - name: Lint with flake8
       run: |
         # stop the build if there are Python syntax errors or undefined names
