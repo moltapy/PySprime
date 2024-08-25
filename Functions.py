@@ -69,7 +69,7 @@ def bcfContactor(workPath: str, popName: str, subVcfFileLists: list, concatedVcf
     expression = "time bcftools concat"
     for fileName in subVcfFileLists:
         expression += f" {workPath}/{popName}/{fileName}"
-    expression += f" --naive-force --output-type z -o {concatPath}/{concatedVcfFiles} > /dev/null"
+    expression += f" --naive-force --output-type z -o {concatPath}/{concatedVcfFiles} > /dev/null 2>&1"
     os.system(expression)
 
 
@@ -85,7 +85,8 @@ def sprimeMain(workPath: str, popName: str, sprimePath: str, concatedVcfFile: st
     os.makedirs(dirpath, exist_ok=True)
     scoreFilePath = [f"{dirpath}/{scoreFilePath.format(chrom=chr)}" for chr in range(1, 23)]
     expressions = [(f"time java -jar {sprimePath} gt={concatedVcfFile} "
-                    f"outgroup={outgroupName} map={mapFilePath} out={out} chrom={chrom} minscore=150000 > /dev/null")
+                    f"outgroup={outgroupName} map={mapFilePath} out={out} "
+                    f"chrom={chrom} minscore=150000 > /dev/null 2>&1")
                    for out, chrom in zip(scoreFilePath, range(1, 23))]
     with ProcessPoolExecutor(max_workers=args.sprimeprocess) as executor:
         futures = [executor.submit(sprimeExecutor, expression) for expression in expressions]
