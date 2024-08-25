@@ -11,7 +11,7 @@ populations = args.populations
 
 if __name__ == "__main__":
     os.makedirs(dirname, exist_ok=True)
-    sample = SampleList(samplelist, outgroup=outgroup, headerTag=sampleheader, popRange=populations)
+    sample = SampleList(samplelist, outgroup=outgroup, headerTag=sampleheader, popRange='GBR,FIN')
     outgroup_path = f"{dirname}/{outgroup_name}"
     with open(outgroup_path, "wt") as out:
         for item in sample.outgroupList:

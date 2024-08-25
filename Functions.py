@@ -44,7 +44,6 @@ def sampleCluster(workPath: str, popName: str, sampleList: list):
 
 
 def bcfExecutor(popName: str, vcfFilePath: str, output: str):
-    print(f"bcfexecutor start ,output={output}")
     try:
         os.system(f"bcftools view --samples-file {popName} {vcfFilePath} | bcftools view -c1 -m2 -M2 -v snps "
                   f"| bcftools annotate -x INFO,^FORMAT/GT -Oz > {output}")
@@ -70,7 +69,7 @@ def bcfContactor(workPath: str, popName: str, subVcfFileLists: list, concatedVcf
     expression = "time bcftools concat"
     for fileName in subVcfFileLists:
         expression += f" {workPath}/{popName}/{fileName}"
-    expression += f" --naive-force --output-type z -o {concatPath}/{concatedVcfFiles}"
+    expression += f" --naive-force --output-type z -o {concatPath}/{concatedVcfFiles} > /dev/null"
     os.system(expression)
 
 
@@ -86,7 +85,7 @@ def sprimeMain(workPath: str, popName: str, sprimePath: str, concatedVcfFile: st
     os.makedirs(dirpath, exist_ok=True)
     scoreFilePath = [f"{dirpath}/{scoreFilePath.format(chrom=chr)}" for chr in range(1, 23)]
     expressions = [(f"time java -jar {sprimePath} gt={concatedVcfFile} "
-                    f"outgroup={outgroupName} map={mapFilePath} out={out} chrom={chrom} minscore=150000")
+                    f"outgroup={outgroupName} map={mapFilePath} out={out} chrom={chrom} minscore=150000 > /dev/null")
                    for out, chrom in zip(scoreFilePath, range(1, 23))]
     with ProcessPoolExecutor(max_workers=args.sprimeprocess) as executor:
         futures = [executor.submit(sprimeExecutor, expression) for expression in expressions]
