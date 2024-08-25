@@ -47,4 +47,5 @@ jobs:
         flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
     - name: Test with pytest
       run: |
-        pytest --pyargs ./Main.py 
+        export PYTHONPATH="/home/runner/work/PySprime:$PYTHONPATH"
+        pytest Main.py 
