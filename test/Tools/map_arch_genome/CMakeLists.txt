@@ -3,6 +3,6 @@
  # 指定项目名称 
  project(maparch)
  # 添加源代码文件
- add_executable(maparch map_arch.cpp)
+ add_executable(maparch archaic_mapping.cpp)
  # 添加zlib库
  target_link_libraries(maparch z)
