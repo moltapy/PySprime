@@ -27,7 +27,7 @@ if __name__ == "__main__":
     with ThreadPoolExecutor(max_workers=args.threads) as pool:
         futures = [pool.submit(Functions.subExtractor, f"{dirname}/{name}", name, modern_list,
                                [f"{dirname}/{name}/{item}" for item in submodern_list]) for name in sample.targetPops]
-        for future in tqdm(as_completed(futures), total=len(futures), desc="Generate VCF files"):
+        for future in tqdm(futures, total=len(futures), desc="Generate VCF files"):
             future.result()
 
     # Bcftools concat VCF files
