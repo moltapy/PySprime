@@ -12,6 +12,6 @@ parser.add_argument('-s', '--sprimethreads',
                     help='max numbers of threads in allocating processing populations in sprime.jar ',
                     type=int, default=2)
 parser.add_argument('-m', '--sprimeprocess',
-                    help='max numbers of processes in allocating chromosomes in sprime.jar', type=int, default=22)
+                    help='max numbers of processes in allocating chromosomes in sprime.jar', type=int, default=4)
 parser.add_argument('-c', '--config', help='config file path', default="Config.ini", type=str)
 args = parser.parse_args()
