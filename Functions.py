@@ -60,7 +60,7 @@ def subExtractor(workPath: str, popName: str, vcfFileLists: list, subVcfFileList
     with ProcessPoolExecutor(max_workers=args.process) as executor:
         futures = [executor.submit(bcfExecutor, sampleFile, inFile, outFile)
                    for inFile, outFile in zip(vcfFileLists, subVcfFileLists)]
-        for future in tqdm(as_completed(futures), total=len(futures), desc="Generate vcffile"):
+        for future in as_completed(futures):
             future.result()
     
 

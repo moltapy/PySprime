@@ -20,28 +20,28 @@ if __name__ == "__main__":
     with ThreadPoolExecutor(max_workers=args.threads) as pool:
         futures = [pool.submit(Functions.sampleCluster, dirname, name, item+sample.outgroupList)
                    for name, item in sample.targetPops.items()]
-        for future in tqdm(as_completed(futures), total=len(futures), desc="Extract sample id"):
+        for future in tqdm(as_completed(futures), total=len(futures), desc="Extract and Cluster"):
             future.result()
 
     # Bcftools split VCF files, get VCF files with a certain modern population and outgroup population
     with ThreadPoolExecutor(max_workers=args.threads) as pool:
         futures = [pool.submit(Functions.subExtractor, f"{dirname}/{name}", name, modern_list,
                                [f"{dirname}/{name}/{item}" for item in submodern_list]) for name in sample.targetPops]
-        for future in tqdm(futures, total=len(futures), desc="Generate VCF files"):
+        for future in tqdm(futures, total=len(futures), desc=f"Bcftools Generate VCFfiles"):
             future.result()
 
     # Bcftools concat VCF files
     with Functions.ProcessPoolExecutor(max_workers=args.threads) as pool:
         futures = [pool.submit(Functions.bcfContactor, dirname, name, submodern_list, concated_file)
                    for name in sample.targetPops]
-        for future in as_completed(futures):
+        for future in tqdm(as_completed(futures), total=len(futures), desc=f"Bcftools Concatenate VCFfiles"):
             future.result()
 
     # Run sprime.jar to get score files
     with ThreadPoolExecutor(max_workers=args.sprimethreads) as pool:
         futures = [pool.submit(Functions.sprimeMain, dirname, name, sprime_path,
                                concated_file, outgroup_name, genetic_map, sprime_out) for name in sample.targetPops]
-        for future in as_completed(futures):
+        for future in tqdm(as_completed(futures), total=len(futures), desc=f"Sprime Main"):
             future.result()
 
     # Mapping Archaic 
@@ -49,14 +49,14 @@ if __name__ == "__main__":
         futures = [pool.submit(Functions.mappingArchaic, dirname, name, maparch, neandtag, neandmask, neanderthal,
                                denitag, denimask, denisovan, sprime_out, neandoutfile, denioutfile)
                    for name in sample.targetPops]
-        for future in as_completed(futures):
+        for future in tqdm(as_completed(futures), total=len(futures), desc=f"Sprime Mapping"):
             future.result()
 
     # Summary Matched Score Files and Draw Contour plots
     with ProcessPoolExecutor(max_workers=args.threads) as pool:
         futures = [pool.submit(Functions.contourDrawer, summary_script, draw_script, dirname, name)
                    for name in sample.targetPops]
-        for future in as_completed(futures):
+        for future in tqdm(as_completed(futures), total=len(futures), desc=f"ContourDrawer"):
             future.result()
 
 ## 设计思想：html显示最终是一种延迟，也就是最后的图像展示，是请求式生成，先生成一个列表，然后按照需求发送get请求生成
