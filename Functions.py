@@ -1,5 +1,5 @@
 import os
-from tqdm import tqdm
+import subprocess
 from concurrent.futures import ProcessPoolExecutor, as_completed
 from Main import args
 
@@ -95,8 +95,8 @@ def sprimeMain(workPath: str, popName: str, sprimePath: str, concatedVcfFile: st
 
 
 def mappingExecutor(expression: tuple):
-    os.system(expression[0])
-    os.system(expression[1])
+    subprocess.run(expression[0], stderr=subprocess.DEVNULL)
+    subprocess.run(expression[1], stderr=subprocess.DEVNULL)
     print("mapping over")
 
 
