@@ -1,8 +1,9 @@
 import configparser
+from Main import args
 
 
 config = configparser.ConfigParser()
-config.read('Config_Test.ini')
+config.read(args.config)
 
 # Paths:
 ## samplelist.txt

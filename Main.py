@@ -1,7 +1,6 @@
 import os
 from tqdm import tqdm
 
-import Functions
 # import LogLoader
 from ClassLoader import *
 from ConfigLoader import *
