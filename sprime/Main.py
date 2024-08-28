@@ -20,7 +20,7 @@ if __name__ == "__main__":
     # Extract sample id from samplelist and cluster with outgroup samples
     try:
         with ThreadPoolExecutor(max_workers=args.threads) as pool:
-            futures = [pool.submit(Functions.sampleCluster, dirname, name, item+sample.outgroupList)
+            futures = [pool.submit(Functions.sampleCluster, dirname, name, item + sample.outgroupList)
                        for name, item in sample.targetPops.items()]
             for future in tqdm(as_completed(futures), total=len(futures), desc="Extract and Cluster"):
                 future.result()
